@@ -31,6 +31,8 @@ Please indicate
 Question 4 on page 76 from Chapter 4 of Data Analysis Using Regression and
 Multilevel/Hierarchical Models.  The codebook can be found
 [here](http://www.stat.columbia.edu/~gelman/arm/examples/pollution/pollution.txt).
+I've included R code blocks for each question, but use them only if you feel it
+necessary.
 
 ```{r, echo=FALSE, cache=TRUE}
 # DO NOT EDIT THIS SECTION!
@@ -74,9 +76,13 @@ pollution <- read.dta(url) %>%
 ```
 
 
-### Additionally f)
+### f)
 
 Why do you think one would use cross-validation?
+
+```{r, echo=FALSE, fig.width=12, fig.height=6}
+
+```
 
 
 
@@ -88,11 +94,13 @@ Why do you think one would use cross-validation?
 
 Using the OkCupid data:
 
-* a) Do an Exploratory Data Analysis
+* a) Do an Exploratory Data Analysis. Include what you think are the highlights
+and or what's relevant to part b).
 * b) Fit what you think is a good predictive model for gender
 * c) Interpret all results.
 
-You must first copy the file `profiles.csv` from Lec09 to the directory `HW-2.Rmd`
+For the R Markdown to work, you must first copy the file `profiles.csv` from
+Lec09 to the project directory `HW-2`.
 
 ```{r, echo=FALSE, cache=TRUE}
 # DO NOT EDIT THIS SECTION!
