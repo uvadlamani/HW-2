@@ -76,9 +76,9 @@ pollution <- read.dta(url) %>%
 ```
 
 
-### f)
+### f) What do you think are the reasons for using cross-validation?
 
-What do you think are the reasons for using cross-validation?
+
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 
@@ -92,12 +92,13 @@ What do you think are the reasons for using cross-validation?
 
 ## Question 2:
 
-Using the OkCupid data:
+Perform an Exploratory Data Analysis (EDA) of the OkCupid data, keeping in mind 
+in HW-3, you will be fitting a logistic regression to predict gender. What do I mean by
+EDA?
 
-* a) Do an Exploratory Data Analysis. Include what you think are the highlights
-and or what's relevant to part b).
-* b) Fit what you think is a good predictive model for gender
-* c) Interpret all results.
+* Visualizations
+* Tables
+* Numerical summaries
 
 For the R Markdown to work, you must first copy the file `profiles.csv` from
 Lec09 to the project directory `HW-2`.
@@ -108,20 +109,13 @@ profiles <- read.csv("profiles.csv", header=TRUE) %>% tbl_df()
 ```
 
 
-### a)
-
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
-
+# Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
+# above
 ```
 
 
-### b)
-
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
-
+# Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
+# above
 ```
-
-
-### c)
-
-
