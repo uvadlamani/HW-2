@@ -18,7 +18,7 @@ Please indicate
 * Who you collaborated with:
 * Roughly how much time you spent on this HW:
 * What gave you the most trouble:
-* Any comments you have:
+* Any comments you have: 
 
 
 
@@ -78,7 +78,7 @@ pollution <- read.dta(url) %>%
 
 ### f)
 
-Why do you think one would use cross-validation?
+What do you think are the reasons for using cross-validation?
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 
