@@ -1,6 +1,6 @@
 ---
 title: "MATH 216 Homework 2"
-author: "WRITE YOUR NAME HERE"
+author: "Sanket Vadlamani"
 output: html_document
 ---
 
@@ -8,6 +8,9 @@ output: html_document
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(foreign))
+suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(plotly))
 ```
 
 
@@ -16,15 +19,9 @@ suppressPackageStartupMessages(library(foreign))
 Please indicate
 
 * Who you collaborated with:
-* Roughly how much time you spent on this HW:
-* What gave you the most trouble:
+* Roughly how much time you spent on this HW: 12 hours
+* What gave you the most trouble: Dealing with the income variable in EDA
 * Any comments you have: 
-
-
-
-
-
-
 
 ## Question 1:
 
@@ -44,50 +41,130 @@ pollution <- read.dta(url) %>%
 ### a)
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
+graph_1 <- ggplot(pollution, aes(x=nox,y=mort)) + 
+  geom_point() + 
+  ggtitle("Mortality Rate VS Nitric Oxide Levels") + 
+  xlab("Level Of Nitric Oxide") + 
+  ylab("Mortality Rate")
+ggplotly(graph_1)
 
+model_a <- lm(mort ~ nox, data=pollution)
+summary(model_a)
+
+graph_2 <- graph_1 + geom_smooth(method="lm", size=1, level=0.95)
+ggplotly(graph_2)
+
+graph_3 <- ggplot(model_a, aes(.fitted, .resid)) +
+  geom_point() + 
+  ggtitle("Diagnostic Plot - Residuals against fitted values") +
+  ylab("Residuals") + 
+  xlab("Fitted values") + 
+  geom_hline(yintercept=0, col="red", linetype="dashed")
+ggplotly(graph_3)
 ```
-
+Looking at the scatter plot "mortality rate vs nitric oxide levels" it seems like a linear model would not be appropriate for regression. This is because the data is skewed. It would appear that a logartihmic transformation would be more appropriate in this case. A confirmation of this is evident in the diagnostic plot of residuals against fitted values. If the model was appropriate, there would be no obvious relationship between the residual values and the fitted values. They would be uniformly dispered horizontally. However in this case as the fitted values increase the residuals increase too which means that the model we have is not appropriate. 
 
 ### b)
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
+pollution <- mutate(pollution, log_mort = log(mort))
+pollution <- mutate(pollution, log_nox = log(nox))
 
+model_b <- lm(log_mort ~ log_nox, data=pollution)
+summary(model_b)
+
+graph_4 <- ggplot(pollution, aes(x=log_nox,y=log_mort)) + 
+  geom_point() +
+  ggtitle("Logarithmic Transformation") + 
+  xlab("log(nox)") + 
+  ylab("log(mort)")
+ggplotly(graph_4)
+
+graph_5 <- graph_4 + geom_smooth(method="lm", size=1, level=0.95)
+ggplotly(graph_5)
+
+graph_6 <- ggplot(model_b, aes(.fitted, .resid)) +
+  geom_point() +
+  ggtitle("Diagnostic Plot - Residuals against fitted values") +
+  ylab("Residuals") + 
+  xlab("Fitted values") + 
+  geom_hline(yintercept=0, col="red", linetype="dashed")
+ggplotly(graph_6)
 ```
-
+The model used in this part is a log-log model. By looking at the diagnostic plot it is evident that the logarthmic trasnformation improved our model (in comparison to the lin-lin used in part a) as there is now a more uniform distribution of the residuals. 
 
 ### c)
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
-
+model_b <- lm(log_mort ~ log_nox, data=pollution)
+summary(model_b)
 ```
-
+The coefficient of log_nox is estimated to be 0.015893. The interpretation is as follows: 
+For a 1% change in the relative nitric oxide pollution potential, our model predicts that on average there will be a 0.015893% change in the total age adjusted mortality rate in the same direction. 
 
 ### d)
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
+pollution <- mutate(pollution, log_hc = log(hc))
+pollution <- mutate(pollution, log_so2 = log(so2))
 
+model_d <- lm(log_mort ~ log_nox + log_hc + log_so2, data=pollution)
+summary(model_d)
+
+graph_7 <- ggplot(pollution, aes(x=log_nox,y=log_mort,col=log_so2, size=log_hc)) + 
+  geom_point() +
+  ggtitle("Logarithmic Transformation") + 
+  xlab("log(nox)") + 
+  ylab("log(mort)")
+ggplotly(graph_7)
+
+graph_8 <- graph_7 + geom_smooth(method="lm", size=1, level=0.95)
+ggplotly(graph_8)
 ```
 
 
 ### e)
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
+pollution_firsthalf <- slice(pollution, 1:30)
+pollution_secondhalf <- slice(pollution, 31:60)
+                              
+model_e <- lm(log_mort ~ log_nox + log_hc + log_so2, data=pollution_firsthalf)
+summary(model_e)
 
+pollution_secondhalf <- mutate(pollution_secondhalf, predicted_log_mort = predict(model_e, pollution_secondhalf))
+pollution_secondhalf <- mutate(pollution_secondhalf, predicted_mort = exp(predicted_log_mort))
+
+predicted_actual <- pollution_secondhalf %>% 
+  select(log_mort, predicted_log_mort)
+kable(predicted_actual)
+
+graph_9 <- ggplot(pollution_secondhalf, aes(x=log_mort,y=predicted_log_mort))+
+  geom_point()+
+  geom_abline(intercept = 0, slope = 1)+
+  ggtitle("Predicted Log Mortality Rate vs Observed Log Mortality Rate") +
+  ylab("Predicted Log Mortality Rate") + 
+  xlab("Observed Log Mortality Rate")
+ggplotly(graph_9)
+
+graph_10 <- ggplot(pollution_secondhalf, aes(x=mort,y=predicted_mort))+
+  geom_point()+
+  geom_abline(intercept = 0, slope = 1)+
+  ggtitle("Predicted Mortality Rate vs Observed Mortality Rate") +
+  ylab("Predicted Mortality Rate") + 
+  xlab("Observed Mortality Rate")
+ggplotly(graph_10)
 ```
 
+Note about the plots: If the model predict with 100% accuracy then all the values on "predicted vs observed" would lie on the straight line (with intercept = 0 and slope = 1).
 
 ### f) What do you think are the reasons for using cross-validation?
-
+Cross validation is useful if we wanted to extend the results of the regression to data that was not originally included in the regression. By obtaining a model with just half the data and then checking to see if it has predictive powers with the other half of the data (the half that was not included in the regression) we can get an understanding of the predicting power of the model. If the model predicts the data well for the second half we can assume that it will do the same for data that we do not have yet.  
 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 
 ```
-
-
-
-
-
 
 
 ## Question 2:
@@ -106,14 +183,70 @@ Lec09 to the project directory `HW-2`.
 ```{r, echo=FALSE, cache=TRUE}
 # DO NOT EDIT THIS SECTION!
 profiles <- read.csv("profiles.csv", header=TRUE) %>% tbl_df()
+
+kable(summary(profiles))
 ```
 
+
+We first obtain a summary of what the data is about and then take a look at the first six lines of the data just to get a feel for what we have to deal with in HW3. 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 # Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
 # above
-```
+ggplot(data=profiles, aes(age,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
+ggplot(data=profiles, aes(height,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(body_type,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(diet,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(drinks,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(drugs,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(smokes,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(education,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(job,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(status,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(orientation,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(pets,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggplot(data=profiles, aes(offspring,fill=sex)) +
+  geom_bar(position="dodge")+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+Our objective is to develop a model that predicts gender. We therefore need to decide what variables to use in this prediction. Now a variable that has a reasonable amount of variation between the sexes would be considered a good predictor variable. However a variable with not much variation between sexes would not be useful. For example say we had a dummy predictor "Firefighter" that took 1 for yes and 0 for no, chances are that most 1s would be male with very few females. Now this would be a good predictor because if someone was a 1 our model would predict that they are much likelier to be male than female. Now take for example a predictor "likes coffee" that took 1 for yes and 0 for no. If there were an approximately equal 1s and 0s for males and females then it would not be a good predictor. Therefore in this exploratory data analysis I looked at tables that show variation between the sexes for several variables. In HW03 I will use this information to help make a model using some of these variables as predictors. 
+Unfortunately I could not understand the income variable which has several rows that take -1 as a value. I also could not create a helpful visualization using ethnicity and language because they have way too many categorical levels. 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 # Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
