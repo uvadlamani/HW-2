@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library(plotly))
 Please indicate
 
 * Who you collaborated with:
-* Roughly how much time you spent on this HW: 12 hours
+* Roughly how much time you spent on this HW: 14 hours
 * What gave you the most trouble: Dealing with the income variable in EDA
 * Any comments you have: 
 
@@ -91,7 +91,7 @@ graph_6 <- ggplot(model_b, aes(.fitted, .resid)) +
   geom_hline(yintercept=0, col="red", linetype="dashed")
 ggplotly(graph_6)
 ```
-The model used in this part is a log-log model. By looking at the diagnostic plot it is evident that the logarthmic trasnformation improved our model (in comparison to the lin-lin used in part a) as there is now a more uniform distribution of the residuals. 
+The first graph of part a) shows a skew in the data. In order to fix this skey the model used in this part is a log-log model. By looking at the diagnostic plot it is evident that the logarthmic trasnformation improved our model (in comparison to the lin-lin used in part a) as there is now a more uniform distribution of the residuals.  
 
 ### c)
 
@@ -159,7 +159,7 @@ ggplotly(graph_10)
 Note about the plots: If the model predict with 100% accuracy then all the values on "predicted vs observed" would lie on the straight line (with intercept = 0 and slope = 1).
 
 ### f) What do you think are the reasons for using cross-validation?
-Cross validation is useful if we wanted to extend the results of the regression to data that was not originally included in the regression. By obtaining a model with just half the data and then checking to see if it has predictive powers with the other half of the data (the half that was not included in the regression) we can get an understanding of the predicting power of the model. If the model predicts the data well for the second half we can assume that it will do the same for data that we do not have yet.  
+Cross validation is useful if we wanted to extend the results of the regression to data that was not originally included in the regression. By obtaining a model with just half the data and then checking to see if it has predictive powers with the other half of the data (the half that was not included in the regression) we can get an understanding of the predicting power of the model. If the model predicts the data well for the second half we can assume that we haven't overfit things.
 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
@@ -184,17 +184,14 @@ Lec09 to the project directory `HW-2`.
 # DO NOT EDIT THIS SECTION!
 profiles <- read.csv("profiles.csv", header=TRUE) %>% tbl_df()
 
-kable(summary(profiles))
 ```
 
-
-We first obtain a summary of what the data is about and then take a look at the first six lines of the data just to get a feel for what we have to deal with in HW3. 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 # Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
 # above
 ggplot(data=profiles, aes(age,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(height,fill=sex)) +
@@ -202,51 +199,53 @@ ggplot(data=profiles, aes(height,fill=sex)) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(body_type,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(diet,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(drinks,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(drugs,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(smokes,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(education,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(job,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(status,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(orientation,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplot(data=profiles, aes(pets,fill=sex)) +
-  geom_bar(position="dodge")+
+  geom_bar(position="fill")+
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
-ggplot(data=profiles, aes(offspring,fill=sex)) +
-  geom_bar(position="dodge")+
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggplot(data=profiles, aes(x=smokes)) + 
+  geom_bar() + 
+  facet_wrap(~drinks) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
 ```
-Our objective is to develop a model that predicts gender. We therefore need to decide what variables to use in this prediction. Now a variable that has a reasonable amount of variation between the sexes would be considered a good predictor variable. However a variable with not much variation between sexes would not be useful. For example say we had a dummy predictor "Firefighter" that took 1 for yes and 0 for no, chances are that most 1s would be male with very few females. Now this would be a good predictor because if someone was a 1 our model would predict that they are much likelier to be male than female. Now take for example a predictor "likes coffee" that took 1 for yes and 0 for no. If there were an approximately equal 1s and 0s for males and females then it would not be a good predictor. Therefore in this exploratory data analysis I looked at tables that show variation between the sexes for several variables. In HW03 I will use this information to help make a model using some of these variables as predictors. 
-Unfortunately I could not understand the income variable which has several rows that take -1 as a value. I also could not create a helpful visualization using ethnicity and language because they have way too many categorical levels. 
+Our objective is to develop a model that predicts gender. We therefore need to decide what variables to use in this prediction. Now a variable that has a reasonable amount of variation between the sexes would be considered a good predictor variable. However a variable with not much variation between sexes would not be useful. For example say we had a dummy predictor "Firefighter" that took 1 for yes and 0 for no, chances are that most 1s would be male with very few females. Now this would be a good predictor because if someone was a 1 our model would predict that they are much likelier to be male than female. Now take for example a predictor "likes coffee" that took 1 for yes and 0 for no. If there were an approximately equal 1s and 0s for males and females then it would not be a good predictor. Therefore in this exploratory data analysis I looked at tables that show variation between the sexes for several variables. It seems like all of the variables do have some variation between the sexes among categories which means that they can all be good predictors of gender. However there could be correlations between some of these variables such as drinking and smoking, job and education. I tried to create a facet to see wether or not smoking and drinking correlate but failed to interpret it because it shows absolute counts and not proportions.
+ 
 
 ```{r, echo=FALSE, fig.width=12, fig.height=6}
 # Feel free to make multiple code blocks, but set echo, fig.width, fig.height as 
